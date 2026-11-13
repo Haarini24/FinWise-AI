@@ -1,0 +1,335 @@
+
+{% extends "base.html" %}
+
+{% block title %}AI Assistant | FinWise AI{% endblock %}
+
+{% block page_heading %}AI Financial Assistant{% endblock %}
+
+{% block content %}
+
+<div class="chat-container">
+
+    <!-- CHAT HEADER -->
+    <div class="chat-header">
+
+        <div class="chat-profile">
+            <div class="ai-avatar">F</div>
+
+            <div>
+                <h3>FinWise AI Assistant</h3>
+                <p>● Ready to assist your business</p>
+            </div>
+        </div>
+
+        <button class="clear-chat-btn" id="clearChat">
+            Clear Chat
+        </button>
+
+    </div>
+
+
+    <!-- CHAT MESSAGES -->
+    <div class="chat-messages" id="chatMessages">
+
+        <div class="chat-welcome" id="welcomeScreen">
+
+            <div class="ai-avatar" style="margin: 0 auto 18px;">
+                F
+            </div>
+
+            <h2>Welcome to FinWise AI!</h2>
+
+            <p>
+                Your intelligent business finance assistant.
+                Ask me about your income, expenses, profit,
+                budgets and business financial performance.
+            </p>
+
+            <div class="suggestion-list">
+
+                <button class="suggestion-btn"
+                    data-question="How much profit did my business make?">
+                    How much profit did I make?
+                </button>
+
+                <button class="suggestion-btn"
+                    data-question="What is my biggest expense?">
+                    What is my biggest expense?
+                </button>
+
+                <button class="suggestion-btn"
+                    data-question="Show me my November 2026 budget status.">
+                    Check my monthly budget
+                </button>
+
+                <button class="suggestion-btn"
+                    data-question="Show me my recent transactions.">
+                    Show recent transactions
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- CHAT INPUT -->
+    <div class="chat-input-area">
+
+        <div class="chat-input-wrapper">
+
+            <textarea
+                class="chat-input"
+                id="chatInput"
+                placeholder="Ask FinWise AI anything about your business..."
+                rows="1"
+            ></textarea>
+
+            <button class="send-btn" id="sendBtn">
+                Send
+            </button>
+
+        </div>
+
+        <p class="chat-note">
+            FinWise AI uses your business records to provide financial insights.
+            Always verify important financial decisions.
+        </p>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+<script>
+
+const chatMessages = document.getElementById("chatMessages");
+const chatInput = document.getElementById("chatInput");
+const sendBtn = document.getElementById("sendBtn");
+const clearChatBtn = document.getElementById("clearChat");
+const welcomeScreen = document.getElementById("welcomeScreen");
+
+
+let isWaiting = false;
+
+
+function scrollToBottom() {
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+
+// CREATE MESSAGE BUBBLE
+
+function addMessage(message, sender) {
+
+    const messageWrapper = document.createElement("div");
+    messageWrapper.className = `chat-message ${sender}`;
+
+    const avatar = document.createElement("div");
+    avatar.className = "message-avatar";
+    avatar.textContent = sender === "user" ? "You" : "F";
+
+    const content = document.createElement("div");
+    content.className = "message-content";
+
+    // Display as plain text to prevent HTML injection.
+    content.textContent = message;
+
+    messageWrapper.appendChild(avatar);
+    messageWrapper.appendChild(content);
+
+    chatMessages.appendChild(messageWrapper);
+
+    scrollToBottom();
+
+    return messageWrapper;
+}
+
+
+// SHOW LOADING INDICATOR
+
+function showTypingIndicator() {
+
+    const indicator = document.createElement("div");
+
+    indicator.className = "typing-indicator";
+    indicator.id = "typingIndicator";
+    indicator.textContent = "FinWise AI is analysing your financial data...";
+
+    chatMessages.appendChild(indicator);
+
+    scrollToBottom();
+
+}
+
+
+function removeTypingIndicator() {
+
+    const indicator = document.getElementById("typingIndicator");
+
+    if (indicator) {
+        indicator.remove();
+    }
+
+}
+
+
+// SEND MESSAGE TO FLASK API
+
+async function sendMessage(message = null) {
+
+    const userMessage = (message ?? chatInput.value).trim();
+
+    if (!userMessage || isWaiting) {
+        return;
+    }
+
+    welcomeScreen.style.display = "none";
+
+    addMessage(userMessage, "user");
+
+    chatInput.value = "";
+    chatInput.style.height = "auto";
+
+    isWaiting = true;
+    sendBtn.disabled = true;
+    sendBtn.textContent = "Thinking...";
+
+    showTypingIndicator();
+
+    try {
+
+        const response = await fetch("/api/chat", {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+                message: userMessage
+            })
+
+        });
+
+
+        const data = await response.json();
+
+        removeTypingIndicator();
+
+
+        if (!response.ok || !data.success) {
+
+            throw new Error(
+                data.error || "Something went wrong."
+            );
+
+        }
+
+        addMessage(data.answer, "assistant");
+
+    }
+
+    catch (error) {
+
+        removeTypingIndicator();
+
+        addMessage(
+            "Sorry, I couldn't process your request. " + error.message,
+            "assistant"
+        );
+
+    }
+
+    finally {
+
+        isWaiting = false;
+        sendBtn.disabled = false;
+        sendBtn.textContent = "Send";
+
+        chatInput.focus();
+
+    }
+
+}
+
+
+// SEND BUTTON
+
+sendBtn.addEventListener("click", function () {
+
+    sendMessage();
+
+});
+
+
+// ENTER TO SEND, SHIFT + ENTER FOR NEW LINE
+
+chatInput.addEventListener("keydown", function (event) {
+
+    if (event.key === "Enter" && !event.shiftKey) {
+
+        event.preventDefault();
+
+        sendMessage();
+
+    }
+
+});
+
+
+// AUTO-RESIZE TEXTAREA
+
+chatInput.addEventListener("input", function () {
+
+    this.style.height = "auto";
+
+    this.style.height = Math.min(this.scrollHeight, 120) + "px";
+
+});
+
+
+// SUGGESTED QUESTIONS
+
+document.querySelectorAll(".suggestion-btn").forEach(button => {
+
+    button.addEventListener("click", function () {
+
+        const question = this.dataset.question;
+
+        sendMessage(question);
+
+    });
+
+});
+
+
+// CLEAR CHAT
+
+clearChatBtn.addEventListener("click", function () {
+
+    if (isWaiting) {
+        return;
+    }
+
+    chatMessages.innerHTML = "";
+
+    chatMessages.appendChild(welcomeScreen);
+
+    welcomeScreen.style.display = "block";
+
+    chatInput.value = "";
+
+    chatInput.focus();
+
+});
+
+</script>
+
+{% endblock %}

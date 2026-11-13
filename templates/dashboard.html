@@ -1,0 +1,138 @@
+
+{% extends "base.html" %}
+
+{% block title %}Dashboard | FinWise AI{% endblock %}
+{% block page_heading %}Financial Dashboard{% endblock %}
+
+{% block content %}
+
+<section class="welcome-section">
+    <div>
+        <h1>Welcome back!</h1>
+        <p>Here's an overview of your business finances.</p>
+    </div>
+    <a href="{{ url_for('transactions') }}" class="primary-btn">
+        + Add Transaction
+    </a>
+</section>
+
+<!-- FINANCIAL SUMMARY -->
+<section class="summary-grid">
+
+    <div class="summary-card income-card">
+        <p>Total Income</p>
+        <h2>₹{{ "%.2f"|format(summary.income) }}</h2>
+        <span>Money received</span>
+    </div>
+
+    <div class="summary-card expense-card">
+        <p>Total Expenses</p>
+        <h2>₹{{ "%.2f"|format(summary.expenses) }}</h2>
+        <span>Money spent</span>
+    </div>
+
+    <div class="summary-card profit-card">
+        <p>Net Profit</p>
+        <h2>₹{{ "%.2f"|format(summary.profit) }}</h2>
+        <span>Income minus expenses</span>
+    </div>
+
+    <div class="summary-card">
+        <p>Profit Margin</p>
+        <h2>{{ "%.2f"|format(summary.profit_margin) }}%</h2>
+        <span>Profit as a percentage of income</span>
+    </div>
+
+</section>
+
+<!-- FINANCIAL ANALYTICS -->
+<section class="analytics-section">
+
+    <div class="section-heading">
+        <div>
+            <h2>Financial Analytics</h2>
+            <p>Visual insights into your business performance</p>
+        </div>
+    </div>
+
+    <div class="analytics-grid">
+
+        <div class="content-card chart-card">
+            {{ income_expense_chart|safe }}
+        </div>
+
+        <div class="content-card chart-card">
+            {{ expense_chart|safe }}
+        </div>
+
+        <div class="content-card chart-card full-width">
+            {{ profit_chart|safe }}
+        </div>
+
+    </div>
+
+</section>
+
+<!-- RECENT TRANSACTIONS -->
+<section class="content-card">
+
+    <div class="section-heading">
+        <div>
+            <h2>Recent Transactions</h2>
+            <p>Your latest financial activities</p>
+        </div>
+
+        <a href="{{ url_for('transactions') }}" class="text-link">
+            View all →
+        </a>
+    </div>
+
+    {% if transactions %}
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Description</th>
+                    <th>Category</th>
+                    <th>Type</th>
+                    <th>Amount</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for transaction in transactions %}
+                <tr>
+                    <td>{{ transaction.description }}</td>
+                    <td>{{ transaction.category_name }}</td>
+                    <td>
+                        <span class="type-badge {{ transaction.transaction_type|lower }}">
+                            {{ transaction.transaction_type }}
+                        </span>
+                    </td>
+                    <td>₹{{ "%.2f"|format(transaction.amount) }}</td>
+                    <td>{{ transaction.transaction_date }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% else %}
+
+    <div class="empty-state">
+        <h3>No transactions yet</h3>
+        <p>Add your first income or expense to see your financial activity here.</p>
+
+        <a href="{{ url_for('transactions') }}" class="primary-btn">
+            Add your first transaction
+        </a>
+    </div>
+
+    {% endif %}
+
+</section>
+
+{% endblock %}
+
