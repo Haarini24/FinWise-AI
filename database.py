@@ -4,7 +4,9 @@ from pathlib import Path
 
 # Project paths
 BASE_DIR = Path(__file__).resolve().parent
-DATABASE_PATH = BASE_DIR / "database" / "finwise.db"
+from config import Config
+
+DATABASE_PATH = Config.DATABASE_PATH
 
 
 def get_connection():
@@ -34,6 +36,30 @@ def init_db():
             currency TEXT NOT NULL DEFAULT 'INR',
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
+    """)
+        # 2. Users table
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            business_id INTEGER NOT NULL,
+            full_name TEXT NOT NULL,
+            email TEXT NOT NULL COLLATE NOCASE UNIQUE,
+            password_hash TEXT NOT NULL,
+            role TEXT NOT NULL
+                CHECK(role IN ('owner', 'manager')),
+            is_active INTEGER NOT NULL DEFAULT 1,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+            FOREIGN KEY (business_id)
+                REFERENCES businesses(id)
+        )
+    """)
+
+    # Allow only one owner per business
+    cursor.execute("""
+        CREATE UNIQUE INDEX IF NOT EXISTS idx_one_owner_per_business
+        ON users (business_id)
+        WHERE role = 'owner'
     """)
 
     # 2. Categories table
@@ -92,6 +118,22 @@ def init_db():
                 REFERENCES categories(id),
 
             UNIQUE (business_id, category_id, budget_month)
+        )
+    """)
+        # 5. Pending transaction drafts
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS pending_transactions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            business_id INTEGER NOT NULL,
+            user_id INTEGER NOT NULL,
+            transaction_data TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+            FOREIGN KEY (business_id)
+                REFERENCES businesses(id),
+
+            FOREIGN KEY (user_id)
+                REFERENCES users(id)
         )
     """)
 

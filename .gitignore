@@ -23,3 +23,15 @@ database/*.sqlite3
 Thumbs.db
 
 .venv313/
+
+# Temporary files
+*.tmp
+*.log
+
+# Python test cache
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Generated files
+uploads/

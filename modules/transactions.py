@@ -1,6 +1,8 @@
-
+import math
+from datetime import date, datetime
 from database import get_connection
 from datetime import date
+
 
 
 def add_transaction(
@@ -22,26 +24,47 @@ def add_transaction(
     except (ValueError, TypeError):
         raise ValueError("Amount must be a valid number.")
 
-    if amount <= 0:
-        raise ValueError("Amount must be greater than zero.")
+    if not math.isfinite(amount) or amount <= 0:
+        raise ValueError("Amount must be a valid number greater than zero.")
+
+    try:
+        category_id = int(category_id)
+    except (ValueError, TypeError):
+        raise ValueError("Please select a valid category.")
 
     transaction_date = transaction_date or date.today().isoformat()
+
+    try:
+        datetime.strptime(transaction_date, "%Y-%m-%d")
+    except (ValueError, TypeError):
+        raise ValueError("Please enter a valid transaction date.")
+
+    payment_methods = (
+        "Other", "Cash", "UPI", "Card", "Bank Transfer"
+    )
+
+    if payment_method not in payment_methods:
+        raise ValueError("Please select a valid payment method.")
+
+    description = (description or "").strip()
+
+    if len(description) > 200:
+        raise ValueError("Description cannot exceed 200 characters.")
 
     connection = get_connection()
 
     try:
-        if category_id is not None:
-            category = connection.execute("""
-                SELECT id FROM categories
-                WHERE id = ?
-                AND business_id = ?
-                AND category_type = ?
-            """, (category_id, business_id, transaction_type)).fetchone()
+        category = connection.execute("""
+            SELECT id FROM categories
+            WHERE id = ?
+            AND business_id = ?
+            AND category_type = ?
+        """, (category_id, business_id, transaction_type)).fetchone()
 
-            if category is None:
-                raise ValueError(
-                    "Selected category does not match this business and transaction type."
-                )
+        if category is None:
+            raise ValueError(
+                "Selected category does not match this business and transaction type."
+            )
 
         cursor = connection.execute("""
             INSERT INTO transactions (
@@ -69,6 +92,7 @@ def add_transaction(
 
     finally:
         connection.close()
+
 
 
 def get_transactions(business_id):

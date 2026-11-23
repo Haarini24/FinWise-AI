@@ -1,5 +1,6 @@
 
 import json
+from datetime import date
 from google import genai
 
 from config import Config
@@ -221,4 +222,198 @@ def test_gemini_connection():
     )
 
     return interaction.output_text
+
+def detect_transaction_intent(user_message):
+    """
+    Detect a possible new income or expense transaction in English.
+    Returns a draft only. It never saves a transaction.
+    """
+
+    client = get_gemini_client()
+
+    allowed_categories = {
+        "Expense": [
+            "Equipment",
+            "Inventory",
+            "Marketing",
+            "Other Expenses",
+            "Rent",
+            "Salaries",
+            "Transportation",
+            "Utilities"
+        ],
+        "Income": [
+            "Other Income",
+            "Sales Revenue",
+            "Service Revenue"
+        ]
+    }
+
+    today = date.today().isoformat()
+
+    prompt = f"""
+You are the transaction detection component of FinWise AI.
+
+Understand the user's message in English only.
+
+Determine whether the message describes a new business income
+or expense transaction.
+
+Available categories:
+{json.dumps(allowed_categories, ensure_ascii=False)}
+
+Return ONLY a valid JSON object with these keys:
+
+{{
+    "is_transaction": true,
+    "transaction_type": "Expense",
+    "amount": 500,
+    "category": "Transportation",
+    "transaction_date": "{today}",
+    "description": "Transportation",
+    "payment_method": "UPI",
+    "missing_fields": [],
+    "needs_clarification": false,
+    "clarification_question": ""
+}}
+
+Rules:
+1. Do not treat questions about existing financial records as new transactions.
+2. Do not invent or assume transaction details.
+3. transaction_type must be Income or Expense.
+4. amount must be a positive number or null.
+5. category must exactly match one of the available categories or be null.
+6. transaction_date must use YYYY-MM-DD format or be null.
+7. payment_method must be one of:
+   Other, Cash, UPI, Card, Bank Transfer, or null.
+8. Do not automatically choose Other when payment method is missing.
+9. If the date is missing, return null. Do not assume today.
+10. If any required detail is missing or unclear, list it in missing_fields.
+11. If clarification is needed, provide a short, clear question in English.
+12. If this is not a transaction request, return is_transaction=false.
+13. Today's date is {today}.
+    If the user says today, use this date.
+    If the user says yesterday, use the previous date.
+    If no date is mentioned or understood, return null.
+
+User message:
+{user_message}
+"""
+
+    response = client.models.generate_content(
+        model=MODEL_NAME,
+        contents=prompt,
+        config={
+            "response_mime_type": "application/json"
+        }
+    )
+
+    try:
+        result = json.loads(response.text)
+
+        if not isinstance(result, dict):
+            raise ValueError("Invalid transaction detection response.")
+
+        return result
+
+    except (json.JSONDecodeError, TypeError):
+        raise ValueError(
+            "FinWise AI could not understand the transaction details."
+        )
+
+def update_transaction_draft(user_message, current_draft):
+    """
+    Update a pending transaction draft using the user's clarification.
+    This function never saves a transaction.
+    """
+
+    client = get_gemini_client()
+
+    allowed_categories = {
+        "Expense": [
+            "Equipment",
+            "Inventory",
+            "Marketing",
+            "Other Expenses",
+            "Rent",
+            "Salaries",
+            "Transportation",
+            "Utilities"
+        ],
+        "Income": [
+            "Other Income",
+            "Sales Revenue",
+            "Service Revenue"
+        ]
+    }
+
+    today = date.today().isoformat()
+
+    prompt = f"""
+You are updating an existing pending transaction draft for FinWise AI.
+
+Understand the user's reply in English only.
+
+Current transaction draft:
+{json.dumps(current_draft, ensure_ascii=False)}
+
+Allowed categories:
+{json.dumps(allowed_categories, ensure_ascii=False)}
+
+Allowed payment methods:
+Other, Cash, UPI, Card, Bank Transfer.
+
+Today's date is {today}.
+
+The user's latest reply is:
+{user_message}
+
+Return ONLY a valid JSON object with these keys:
+{{
+    "transaction_type": "Expense",
+    "amount": 500,
+    "category": "Transportation",
+    "transaction_date": "{today}",
+    "description": "Transportation",
+    "payment_method": "UPI",
+    "missing_fields": [],
+    "clarification_question": ""
+}}
+
+Rules:
+1. Preserve all existing details unless the user clearly corrects them.
+2. Update only details supported by the user's reply.
+3. Never invent or assume missing information.
+4. If the user gives an unclear answer, keep that field missing.
+5. Category must exactly match an allowed category for the transaction type.
+6. Amount must be a positive number or null.
+7. Date must use YYYY-MM-DD or null.
+8. Do not assume today's date unless the user says today.
+9. Payment method must be one of the allowed methods or null.
+10. Required fields are transaction_type, amount, category,
+    transaction_date and payment_method.
+11. List every missing or unclear required field in missing_fields.
+12. Ask a short clarification question if any required field is missing.
+"""
+
+    response = client.models.generate_content(
+        model=MODEL_NAME,
+        contents=prompt,
+        config={
+            "response_mime_type": "application/json"
+        }
+    )
+
+    try:
+        result = json.loads(response.text)
+
+        if not isinstance(result, dict):
+            raise ValueError("Invalid transaction draft update.")
+
+        return result
+
+    except (json.JSONDecodeError, TypeError):
+        raise ValueError(
+            "FinWise AI could not understand your clarification."
+        )
 

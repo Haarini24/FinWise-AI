@@ -14,19 +14,28 @@
             <span class="brand-icon">F</span>
             <span>FinWise AI</span>
         </div>
+<p class="nav-label">WORKSPACE</p>
+<nav>
+    <a href="{{ url_for('dashboard') }}">Dashboard</a>
+    <a href="{{ url_for('transactions') }}">Transactions</a>
+    <a href="{{ url_for('budget') }}">Budget</a>
+    <a href="{{ url_for('ai_assistant') }}">AI Assistant</a>
 
-        <p class="nav-label">WORKSPACE</p>
+    {% if session.get('user') and session['user']['role'] == 'owner' %}
+        <a href="{{ url_for('add_manager') }}">Add Manager</a>
+    {% endif %}
+</nav>
 
-        <nav>
-            <a href="{{ url_for('dashboard') }}">Dashboard</a>
-            <a href="{{ url_for('transactions') }}">Transactions</a>
-            <a href="{{ url_for('ai_assistant') }}">AI Assistant</a>
-        </nav>
+<div class="sidebar-footer">
+    <p>Smart Finance Management</p>
+    <small>Powered by AI</small>
 
-        <div class="sidebar-footer">
-            <p>Smart Finance Management</p>
-            <small>Powered by AI</small>
-        </div>
+    {% if session.get('user') %}
+        <p>{{ session['user']['full_name'] }}</p>
+        <a href="{{ url_for('logout') }}">Logout</a>
+    {% endif %}
+</div>
+
     </aside>
 
     <main class="main-content">

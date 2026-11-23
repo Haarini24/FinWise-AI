@@ -1,0 +1,64 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Manager | FinWise AI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body class="auth-page">
+
+    <div class="auth-card">
+        <div class="auth-brand">FinWise AI</div>
+
+        <h2>Add Manager</h2>
+        <p class="auth-description">
+            Create a manager account for your business.
+        </p>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash-message {{ category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="{{ url_for('add_manager') }}">
+
+            <div class="form-group">
+                <label for="full_name">Full Name</label>
+                <input type="text" id="full_name" name="full_name"
+                       placeholder="Enter manager's name" required>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email"
+                       placeholder="Enter manager's email" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Temporary Password</label>
+                <input type="password" id="password" name="password"
+                       placeholder="At least 8 characters"
+                       minlength="8" required>
+            </div>
+
+            <button type="submit" class="primary-btn auth-submit">
+                Create Manager Account
+            </button>
+
+        </form>
+
+        <p class="auth-footer">
+            <a href="{{ url_for('dashboard') }}">Back to Dashboard</a>
+        </p>
+    </div>
+
+</body>
+</html>

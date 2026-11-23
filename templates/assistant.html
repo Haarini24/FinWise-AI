@@ -76,21 +76,32 @@
 
     <!-- CHAT INPUT -->
     <div class="chat-input-area">
+    <div class="chat-input-wrapper">
 
-        <div class="chat-input-wrapper">
+    <input type="hidden" id="voiceLanguage" value="en-IN">
 
-            <textarea
-                class="chat-input"
-                id="chatInput"
-                placeholder="Ask FinWise AI anything about your business..."
-                rows="1"
-            ></textarea>
+    <textarea
+        class="chat-input"
+        id="chatInput"
+        placeholder="Ask FinWise AI anything about your business..."
+        rows="1"
+    ></textarea>
 
-            <button class="send-btn" id="sendBtn">
-                Send
-            </button>
+    <button class="mic-btn" id="micBtn" type="button"
+            title="Speak to FinWise AI">
+        🎤
+    </button>
 
-        </div>
+    <button class="send-btn" id="sendBtn">
+        Send
+    </button>
+
+</div>
+
+<p id="voiceStatus" class="chat-note">
+    Tap the microphone and speak in English.
+</p>
+
 
         <p class="chat-note">
             FinWise AI uses your business records to provide financial insights.
@@ -107,15 +118,60 @@
 {% block scripts %}
 
 <script>
-
+console.log("FINWISE ASSISTANT SCRIPT LOADED");
 const chatMessages = document.getElementById("chatMessages");
 const chatInput = document.getElementById("chatInput");
 const sendBtn = document.getElementById("sendBtn");
 const clearChatBtn = document.getElementById("clearChat");
+const micBtn = document.getElementById("micBtn");
+const voiceLanguage = document.getElementById("voiceLanguage");
+const voiceStatus = document.getElementById("voiceStatus");
+
+const SpeechRecognition =
+    window.SpeechRecognition || window.webkitSpeechRecognition;
+
+let recognition = null;
 const welcomeScreen = document.getElementById("welcomeScreen");
 
 
 let isWaiting = false;
+// TEXT TO SPEECH
+
+
+window.speakResponse = function(message) {
+    if (!("speechSynthesis" in window)) {
+        voiceStatus.textContent =
+            "Speech output is not supported in this browser.";
+        return;
+    }
+
+    window.speechSynthesis.cancel();
+
+    const voices = window.speechSynthesis.getVoices();
+    const selectedLanguage = voiceLanguage.value;
+    const languageCode = selectedLanguage.split("-")[0];
+
+    // Prefer the selected language; otherwise use an available voice.
+    const selectedVoice =
+        voices.find(voice => voice.lang === selectedLanguage) ||
+        voices.find(voice => voice.lang.startsWith(languageCode)) ||
+        voices[0];
+
+    const speech = new SpeechSynthesisUtterance(message);
+
+    if (selectedVoice) {
+        speech.voice = selectedVoice;
+        speech.lang = selectedVoice.lang;
+    } else {
+        speech.lang = selectedLanguage;
+    }
+
+    speech.rate = 1;
+    speech.pitch = 1;
+
+    window.speechSynthesis.speak(speech);
+};
+
 
 
 function scrollToBottom() {
@@ -148,6 +204,97 @@ function addMessage(message, sender) {
     scrollToBottom();
 
     return messageWrapper;
+}
+function addTransactionActions() {
+
+    const actionWrapper = document.createElement("div");
+    actionWrapper.className = "transaction-actions";
+
+    const confirmBtn = document.createElement("button");
+    confirmBtn.textContent = "Confirm Transaction";
+    confirmBtn.className = "confirm-transaction-btn";
+
+    const cancelBtn = document.createElement("button");
+    cancelBtn.textContent = "Cancel";
+    cancelBtn.className = "cancel-transaction-btn";
+
+    actionWrapper.appendChild(confirmBtn);
+    actionWrapper.appendChild(cancelBtn);
+
+    const messageWrapper = document.createElement("div");
+    messageWrapper.className = "chat-message assistant";
+
+    const content = document.createElement("div");
+    content.className = "message-content";
+
+    content.appendChild(actionWrapper);
+    messageWrapper.appendChild(content);
+
+    chatMessages.appendChild(messageWrapper);
+
+    confirmBtn.addEventListener("click", async () => {
+        confirmBtn.disabled = true;
+        cancelBtn.disabled = true;
+        confirmBtn.textContent = "Saving...";
+
+        try {
+            const response = await fetch("/api/confirm-transaction", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({})
+            });
+
+            const data = await response.json();
+
+            if (!response.ok || !data.success) {
+                throw new Error(data.error || "Unable to save transaction.");
+            }
+
+            addMessage(data.message, "assistant");
+            window.speakResponse(data.message);
+            actionWrapper.remove();
+
+        } catch (error) {
+            addMessage(error.message, "assistant");
+            confirmBtn.disabled = false;
+            cancelBtn.disabled = false;
+            confirmBtn.textContent = "Confirm Transaction";
+        }
+    });
+
+    cancelBtn.addEventListener("click", async () => {
+        confirmBtn.disabled = true;
+        cancelBtn.disabled = true;
+
+        try {
+            const response = await fetch("/api/cancel-transaction", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({})
+            });
+
+            const data = await response.json();
+
+            if (!response.ok || !data.success) {
+                throw new Error(data.error || "Unable to cancel transaction.");
+            }
+
+            addMessage(data.message, "assistant");
+            window.speakResponse(data.message);
+            actionWrapper.remove();
+
+        } catch (error) {
+            addMessage(error.message, "assistant");
+            confirmBtn.disabled = false;
+            cancelBtn.disabled = false;
+        }
+    });
+
+    scrollToBottom();
 }
 
 
@@ -190,7 +337,6 @@ async function sendMessage(message = null) {
     }
 
     welcomeScreen.style.display = "none";
-
     addMessage(userMessage, "user");
 
     chatInput.value = "";
@@ -205,38 +351,34 @@ async function sendMessage(message = null) {
     try {
 
         const response = await fetch("/api/chat", {
-
             method: "POST",
-
             headers: {
                 "Content-Type": "application/json"
             },
-
             body: JSON.stringify({
                 message: userMessage
             })
-
         });
-
 
         const data = await response.json();
 
         removeTypingIndicator();
 
-
         if (!response.ok || !data.success) {
-
             throw new Error(
                 data.error || "Something went wrong."
             );
-
         }
 
         addMessage(data.answer, "assistant");
 
-    }
+        if (data.requires_confirmation === true) {
+            addTransactionActions();
+        }
 
-    catch (error) {
+        window.speakResponse(data.answer);
+
+    } catch (error) {
 
         removeTypingIndicator();
 
@@ -245,27 +387,75 @@ async function sendMessage(message = null) {
             "assistant"
         );
 
-    }
-
-    finally {
+    } finally {
 
         isWaiting = false;
         sendBtn.disabled = false;
         sendBtn.textContent = "Send";
 
         chatInput.focus();
-
     }
+}
 
+// VOICE RECOGNITION
+
+if (!SpeechRecognition) {
+    micBtn.disabled = true;
+    voiceStatus.textContent =
+        "Voice recognition is not supported in this browser. Try Chrome or Edge.";
+} else {
+    recognition = new SpeechRecognition();
+
+    recognition.lang = voiceLanguage.value;
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+    recognition.onstart = function () {
+        micBtn.textContent = "🔴";
+        voiceStatus.textContent = "Listening... Speak now.";
+    };
+
+    recognition.onresult = function (event) {
+        const transcript = event.results[0][0].transcript;
+
+        chatInput.value = transcript;
+        voiceStatus.textContent = "Voice captured. Sending your message...";
+
+        sendMessage(transcript);
+    };
+
+    recognition.onerror = function (event) {
+        voiceStatus.textContent =
+            "Voice recognition error: " + event.error;
+    };
+
+    recognition.onend = function () {
+        micBtn.textContent = "🎤";
+
+        if (voiceStatus.textContent === "Listening... Speak now.") {
+            voiceStatus.textContent = "Tap the microphone to speak again.";
+        }
+    };
+
+    micBtn.addEventListener("click", function () {
+        if (isWaiting) return;
+
+        recognition.lang = voiceLanguage.value;
+
+        try {
+            recognition.start();
+        } catch (error) {
+            voiceStatus.textContent =
+                "Microphone is already active. Please wait.";
+        }
+    });
 }
 
 
 // SEND BUTTON
 
 sendBtn.addEventListener("click", function () {
-
     sendMessage();
-
 });
 
 

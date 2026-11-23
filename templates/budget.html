@@ -1,0 +1,198 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="welcome-section">
+    <div>
+        <h1>Budget Management</h1>
+        <p>Plan your expenses and monitor your monthly spending.</p>
+    </div>
+</div>
+<div class="content-card budget-month-card"></div>
+<!-- Month Selection -->
+<div class="content-card">
+    <form method="GET" action="{{ url_for('budget') }}">
+        <div class="form-grid">
+            <div class="form-group">
+                <label for="month">Select Budget Month</label>
+                <input
+                    type="month"
+                    id="month"
+                    name="month"
+                    value="{{ selected_month }}"
+                    required
+                >
+            </div>
+            <div class="form-group" style="justify-content: flex-end;">
+                <button type="submit" class="primary-btn">
+                    View Budget
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Budget Summary -->
+<div class="summary-grid budget-summary-grid">
+
+    <div class="summary-card profit-card">
+        <p>Total Budget</p>
+        <h2>₹{{ "%.2f"|format(budget.total_budget) }}</h2>
+        <span>Planned monthly expenses</span>
+    </div>
+
+    <div class="summary-card expense-card">
+        <p>Total Spent</p>
+        <h2>₹{{ "%.2f"|format(budget.total_spent) }}</h2>
+        <span>Expenses recorded this month</span>
+    </div>
+
+    <div class="summary-card income-card">
+        <p>Remaining Budget</p>
+        <h2>₹{{ "%.2f"|format(budget.total_remaining) }}</h2>
+        <span>Available budget balance</span>
+    </div>
+
+</div>
+<div class="content-card budget-form-card"></div>
+<!-- Set Budget Form -->
+<div class="content-card">
+
+    <div class="section-heading">
+        <div>
+            <h2>Set Category Budget</h2>
+            <p>Add a new budget or update an existing category budget.</p>
+        </div>
+    </div>
+
+    <form method="POST" action="{{ url_for('budget') }}">
+
+        <input
+            type="hidden"
+            name="budget_month"
+            value="{{ selected_month }}"
+        >
+
+        <div class="form-grid">
+
+            <div class="form-group">
+                <label for="category_id">Expense Category</label>
+
+                <select name="category_id" id="category_id" required>
+                    <option value="">Select a category</option>
+
+                    {% for category in categories %}
+                    <option value="{{ category.id }}">
+                        {{ category.category_name }}
+                    </option>
+                    {% endfor %}
+
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="budget_amount">Monthly Budget Amount (₹)</label>
+
+                <input
+                    type="number"
+                    id="budget_amount"
+                    name="budget_amount"
+                    placeholder="Enter amount"
+                    min="0.01"
+                    step="0.01"
+                    required
+                >
+            </div>
+
+        </div>
+
+        <button type="submit" class="primary-btn">
+            Save Budget
+        </button>
+
+    </form>
+
+</div>
+<div class="content-card budget-tracking-card"></div>
+<!-- Category Budget Details -->
+<div class="content-card">
+
+    <div class="section-heading">
+        <div>
+            <h2>Category-wise Budget Tracking</h2>
+            <p>Monitor how much you spend in each category.</p>
+        </div>
+    </div>
+
+    {% if budget.categories %}
+
+    <div class="table-wrapper">
+        <table>
+
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th>Budget</th>
+                    <th>Spent</th>
+                    <th>Remaining</th>
+                    <th>Usage</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for item in budget.categories %}
+
+                <tr>
+                    <td>{{ item.category }}</td>
+
+                    <td>
+                        ₹{{ "%.2f"|format(item.budget) }}
+                    </td>
+
+                    <td>
+                        ₹{{ "%.2f"|format(item.spent) }}
+                    </td>
+
+                    <td>
+                        ₹{{ "%.2f"|format(item.remaining) }}
+                    </td>
+
+                    <td>
+                        {{ "%.1f"|format(item.percentage_used) }}%
+                    </td>
+
+                    <td>
+                        {% if item.status == "Exceeded" %}
+                            <span class="type-badge expense">
+                                Exceeded
+                            </span>
+                        {% else %}
+                            <span class="type-badge income">
+                                Within Budget
+                            </span>
+                        {% endif %}
+                    </td>
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+    </div>
+
+    {% else %}
+
+    <div class="empty-state">
+        <h3>No Budgets Found</h3>
+        <p>Set a budget for an expense category to start tracking your spending.</p>
+    </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

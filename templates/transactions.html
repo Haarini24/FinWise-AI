@@ -5,6 +5,27 @@
 {% block page_heading %}Transactions{% endblock %}
 
 {% block content %}
+<!-- CSV Import Section -->
+<div class="content-card csv-import-card">
+    <h2>Import Transactions from CSV</h2>
+    <p>Upload an existing CSV file to import multiple transactions.</p>
+
+    <form action="{{ url_for('upload_transactions_csv') }}"
+          method="POST"
+          enctype="multipart/form-data">
+
+        <input
+            type="file"
+            name="csv_file"
+            accept=".csv"
+            required
+        >
+
+        <button type="submit" class="primary-btn">
+            Upload CSV
+        </button>
+    </form>
+</div>
 
 <section class="welcome-section">
     <div>
@@ -13,17 +34,16 @@
     </div>
 </section>
 
-<section class="content-card">
-    <div class="section-heading">
-        <div>
+<section class="content-card transaction-entry-card">
             <h2>Add New Transaction</h2>
             <p>Enter your business financial activity below.</p>
         </div>
     </div>
 
     <form action="{{ url_for('add_transaction_route') }}"
-          method="POST"
-          class="transaction-form">
+      method="POST"
+      class="transaction-form transaction-entry-form"
+      id="transaction-form">
 
         <div class="form-grid">
 
@@ -84,19 +104,90 @@
                 <input type="text"
                        name="description"
                        id="description"
+                       maxlength="200"
                        placeholder="e.g. Monthly sales">
             </div>
 
         </div>
 
-        <button type="submit" class="primary-btn">
-            + Save Transaction
-        </button>
+       <div class="form-actions">
+    <button type="submit" class="primary-btn">
+        + Save Transaction
+    </button>
+
+    <button type="submit"
+            class="primary-btn"
+            name="submit_action"
+            value="add_another">
+        Save & Add Another
+    </button>
+</div>
+    </form>
+</section>
+
+
+<section class="content-card transaction-filter-card">
+    <div class="section-heading">
+        <div>
+            <h2>Filter Transactions</h2>
+            <p>Find transactions using the filters below.</p>
+        </div>
+    </div>
+
+    <form method="GET" action="{{ url_for('transactions') }}" class="transaction-form">
+
+        <div class="form-grid">
+
+            <div class="form-group">
+                <label for="type">Transaction Type</label>
+                <select name="type" id="type">
+                    <option value="">All Types</option>
+                    <option value="Income" {% if selected_type == 'Income' %}selected{% endif %}>Income</option>
+                    <option value="Expense" {% if selected_type == 'Expense' %}selected{% endif %}>Expense</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="filter_category">Category</label>
+                <select name="category_id" id="filter_category">
+                    <option value="">All Categories</option>
+                    {% for category in categories %}
+                    <option value="{{ category.id }}"
+                        {% if selected_category|string == category.id|string %}selected{% endif %}>
+                        {{ category.category_name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="start_date">From Date</label>
+                <input type="date" name="start_date" id="start_date" value="{{ start_date }}">
+            </div>
+
+            <div class="form-group">
+                <label for="end_date">To Date</label>
+                <input type="date" name="end_date" id="end_date" value="{{ end_date }}">
+            </div>
+
+            <div class="form-group">
+                <label for="search">Search Description</label>
+                <input type="text" name="search" id="search"
+                       value="{{ search }}" placeholder="Search transactions...">
+            </div>
+
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="primary-btn">Apply Filters</button>
+            <a href="{{ url_for('transactions') }}" class="text-link">Clear Filters</a>
+        </div>
 
     </form>
 </section>
 
-<section class="content-card">
+
+<section class="content-card transaction-history-card">
     <div class="section-heading">
         <div>
             <h2>Transaction History</h2>
@@ -180,6 +271,16 @@
     }
 
     typeSelect.addEventListener("change", filterCategories);
+    const dateInput = document.getElementById("transaction_date");
+
+if (dateInput && !dateInput.value) {
+    const today = new Date();
+    const localDate = new Date(
+        today.getTime() - today.getTimezoneOffset() * 60000
+    ).toISOString().split("T")[0];
+
+    dateInput.value = localDate;
+}
 </script>
 
 {% endblock %}

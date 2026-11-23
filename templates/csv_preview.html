@@ -1,0 +1,77 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+<div class="section-card">
+    <h2>CSV Import Preview</h2>
+    <p>Review the transactions below before importing them.</p>
+
+    <p><strong>Total rows:</strong> {{ rows|length }}</p>
+
+    {% if errors %}
+    <div class="alert alert-danger">
+        <h3>Import Errors</h3>
+        <p>Please correct these issues in your CSV and upload it again.</p>
+
+        <ul>
+            {% for error in errors %}
+                <li>{{ error }}</li>
+            {% endfor %}
+        </ul>
+
+        <p>Valid rows: {{ valid_count }}</p>
+        <p>No transactions have been imported.</p>
+    </div>
+{% else %}
+    <p>All rows passed validation!</p>
+{% endif %}
+
+    <div style="overflow-x: auto;">
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Transaction Type</th>
+                    <th>Category</th>
+                    <th>Amount</th>
+                    <th>Description</th>
+                    <th>Payment Method</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for row in rows %}
+                <tr>
+                    <td>{{ row["Date"] }}</td>
+                    <td>{{ row["Transaction Type"] }}</td>
+                    <td>{{ row["Category"] }}</td>
+                    <td>{{ row["Amount"] }}</td>
+                    <td>{{ row["Description"] }}</td>
+                    <td>{{ row["Payment Method"] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <p>
+        This is only a preview. No transactions have been saved yet.
+    </p>
+
+  <div class="form-actions">
+   {% if not errors %}
+    <form action="{{ url_for('confirm_csv_import') }}" method="POST">
+        <button type="submit" class="primary-btn">
+            Confirm Import
+        </button>
+    </form>
+{% endif %}
+
+   <form action="{{ url_for('cancel_csv_import') }}" method="POST">
+    <button type="submit" class="secondary-btn">
+        Cancel Import
+    </button>
+</form>
+</div>
+</div>
+{% endblock %}

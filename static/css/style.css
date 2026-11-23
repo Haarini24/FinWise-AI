@@ -3,19 +3,38 @@
    FINWISE AI - MAIN STYLESHEET
 ===================================== */
 
+
 :root {
-    --background: #0b1020;
-    --sidebar: #10172a;
-    --surface: #151e32;
-    --surface-light: #1c2740;
-    --border: #29344d;
-    --text: #f4f6fc;
-    --muted: #929db5;
-    --purple: #8b5cf6;
-    --purple-hover: #7544e8;
-    --green: #34d399;
-    --red: #fb7185;
+    /* Main colour palette */
+    --background: #F4F6FA;
+    --sidebar: #263B57;
+    --surface: #FFFFFF;
+    --surface-light: #EAF0F7;
+    --border: #DCE4EE;
+
+    /* Typography */
+    --text: #26364A;
+    --muted: #8291A5;
+
+    /* Primary blue shades */
+    --purple: #587DA5;
+    --purple-hover: #42678F;
+
+    /* Financial status colours */
+    --green: #3D9B83;
+    --red: #D97982;
+
+    /* Additional design colours */
+    --deep-blue: #263B57;
+    --dusty-blue: #7897B8;
+    --powder-blue: #DCE7F2;
+    --pearl: #F8F9FC;
+
+    /* Soft shadows */
+    --shadow-soft: 0 5px 20px rgba(38, 59, 87, 0.06);
+    --shadow-hover: 0 12px 28px rgba(38, 59, 87, 0.12);
 }
+
 
 * {
     margin: 0;
@@ -199,11 +218,12 @@ body {
     background: rgba(251, 113, 133, 0.22);
 }
 
+
 /* SUMMARY CARDS */
 
 .summary-grid {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 20px;
     margin-bottom: 30px;
 }
@@ -211,25 +231,37 @@ body {
 .summary-card {
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 24px;
-    min-height: 150px;
+    border-radius: 18px;
+    padding: 25px 22px;
+    min-height: 155px;
+    box-shadow: var(--shadow-soft);
+    transition: transform 0.3s ease,
+                box-shadow 0.3s ease,
+                border-color 0.3s ease;
+}
+
+.summary-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-hover);
+    border-color: #C7D6E5;
 }
 
 .summary-card p {
-    color: var(--muted);
-    font-size: 14px;
+    color: #8291A5;
+    font-size: 13px;
+    font-weight: 500;
     margin-bottom: 18px;
 }
 
 .summary-card h2 {
-    font-size: 27px;
-    margin-bottom: 10px;
+    font-size: 25px;
+    font-weight: 600;
+    margin-bottom: 12px;
     overflow-wrap: anywhere;
 }
 
 .summary-card span {
-    color: var(--muted);
+    color: #8291A5;
     font-size: 12px;
 }
 
@@ -253,6 +285,26 @@ body {
 .profit-card {
     border-top: 3px solid var(--purple);
 }
+
+/* Responsive summary cards */
+
+@media (max-width: 1100px) {
+    .summary-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 600px) {
+    .summary-grid {
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
+
+    .summary-card {
+        min-height: 135px;
+    }
+}
+
 
 /* CONTENT CARDS */
 
@@ -282,11 +334,13 @@ body {
     font-size: 12px;
 }
 
+
 /* TABLES */
 
 .table-wrapper {
     width: 100%;
     overflow-x: auto;
+    border-radius: 12px;
 }
 
 table {
@@ -296,24 +350,31 @@ table {
 }
 
 th {
-    color: var(--muted);
+    color: #8291A5;
     font-size: 11px;
     font-weight: 600;
     text-align: left;
-    padding: 14px 12px;
-    border-bottom: 1px solid var(--border);
+    padding: 15px 14px;
+    border-bottom: 1px solid #DCE4EE;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.6px;
+    background: #F8FAFD;
 }
 
 td {
-    padding: 16px 12px;
+    padding: 17px 14px;
     font-size: 13px;
-    border-bottom: 1px solid var(--border);
+    color: #40546B;
+    border-bottom: 1px solid #E8EDF3;
+    transition: background 0.2s ease;
+}
+
+tbody tr {
+    transition: background 0.2s ease;
 }
 
 tbody tr:hover {
-    background: rgba(255, 255, 255, 0.02);
+    background: #F2F6FA;
 }
 
 tbody tr:last-child td {
@@ -322,20 +383,25 @@ tbody tr:last-child td {
 
 .type-badge {
     display: inline-block;
-    padding: 5px 9px;
+    padding: 6px 11px;
     border-radius: 20px;
     font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.2px;
 }
 
 .type-badge.income {
-    color: var(--green);
-    background: rgba(52, 211, 153, 0.1);
+    color: #32947C;
+    background: #E8F7F2;
+    border: 1px solid #D1EEE5;
 }
 
 .type-badge.expense {
-    color: var(--red);
-    background: rgba(251, 113, 133, 0.1);
+    color: #CD727B;
+    background: #FCEDEF;
+    border: 1px solid #F5DADD;
 }
+
 
 /* FORMS */
 
@@ -494,20 +560,26 @@ tbody tr:last-child td {
    FINWISE AI - CHAT ASSISTANT
 ===================================== */
 
+/* CHAT CONTAINER */
+
 .chat-container {
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 16px;
+    border-radius: 20px;
     overflow: hidden;
     display: flex;
     flex-direction: column;
     height: calc(100vh - 180px);
     min-height: 480px;
+    box-shadow: var(--shadow-soft);
 }
 
+/* CHAT HEADER */
+
 .chat-header {
-    padding: 20px 24px;
-    border-bottom: 1px solid var(--border);
+    padding: 21px 25px;
+    border-bottom: 1px solid #E8EDF3;
+    background: #FFFFFF;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -516,51 +588,65 @@ tbody tr:last-child td {
 .chat-profile {
     display: flex;
     align-items: center;
-    gap: 13px;
+    gap: 14px;
 }
+
 
 .ai-avatar {
     width: 42px;
     height: 42px;
-    border-radius: 12px;
+    border-radius: 14px;
     display: grid;
     place-items: center;
-    background: linear-gradient(135deg, #8b5cf6, #5b35bd);
+    background: linear-gradient(135deg, #7897B8, #42678F);
+    color: #FFFFFF;
     font-size: 20px;
     font-weight: 700;
+    box-shadow: 0 5px 14px rgba(66, 103, 143, 0.20);
 }
+
 
 .chat-profile h3 {
     font-size: 15px;
+    font-weight: 600;
+    color: #263B57;
     margin-bottom: 5px;
 }
 
 .chat-profile p {
-    color: var(--green);
+    color: #3D9B83;
     font-size: 12px;
 }
 
 .clear-chat-btn {
-    background: transparent;
-    border: 1px solid var(--border);
-    color: var(--muted);
-    padding: 9px 13px;
-    border-radius: 8px;
+    background: #F5F8FC;
+    border: 1px solid #DCE5EF;
+    color: #60758D;
+    padding: 9px 15px;
+    border-radius: 10px;
     cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    transition: all 0.25s ease;
 }
 
 .clear-chat-btn:hover {
-    color: white;
-    background: var(--surface-light);
+    color: #263B57;
+    background: #EAF0F7;
+    border-color: #C7D6E5;
+    transform: translateY(-2px);
 }
+
+
+/* CHAT MESSAGES */
 
 .chat-messages {
     flex: 1;
     overflow-y: auto;
-    padding: 25px;
+    padding: 28px;
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 22px;
 }
 
 .chat-message {
@@ -575,103 +661,144 @@ tbody tr:last-child td {
     flex-direction: row-reverse;
 }
 
+/* MESSAGE AVATARS */
+
 .message-avatar {
-    width: 32px;
-    height: 32px;
-    min-width: 32px;
-    border-radius: 10px;
-    background: var(--surface-light);
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
+    border-radius: 11px;
     display: grid;
     place-items: center;
-    font-size: 12px;
-    font-weight: 700;
+    font-size: 11px;
+    font-weight: 600;
 }
 
 .chat-message.assistant .message-avatar {
-    background: rgba(139, 92, 246, 0.2);
-    color: #b49aff;
+    background: #E5EDF6;
+    color: #42678F;
+    border: 1px solid #D4E0ED;
 }
 
 .chat-message.user .message-avatar {
-    background: rgba(52, 211, 153, 0.15);
-    color: var(--green);
+    background: #E8F4EF;
+    color: #398C76;
+    border: 1px solid #D5EAE1;
 }
 
+/* MESSAGE CONTENT */
+
 .message-content {
-    background: var(--surface-light);
-    padding: 13px 16px;
-    border-radius: 4px 13px 13px 13px;
-    line-height: 1.7;
+    background: #F7F9FC;
+    border: 1px solid #E5EBF2;
+    color: #40546B;
+    padding: 15px 18px;
+    border-radius: 5px 16px 16px 16px;
+    line-height: 1.75;
     font-size: 13px;
     overflow-wrap: anywhere;
     white-space: pre-wrap;
 }
 
 .chat-message.user .message-content {
-    background: rgba(139, 92, 246, 0.2);
-    border: 1px solid rgba(139, 92, 246, 0.25);
-    border-radius: 13px 4px 13px 13px;
+    background: #EAF1F8;
+    border: 1px solid #D5E1ED;
+    color: #344B64;
+    border-radius: 16px 5px 16px 16px;
 }
+
+
+
+.
+/* WELCOME SCREEN */
 
 .chat-welcome {
     text-align: center;
-    max-width: 550px;
+    max-width: 580px;
     margin: auto;
-    padding: 20px;
+    padding: 28px 20px;
 }
 
 .chat-welcome h2 {
-    font-size: 23px;
+    font-size: 24px;
+    font-weight: 600;
+    color: #263B57;
+    letter-spacing: -0.5px;
     margin-bottom: 12px;
 }
 
 .chat-welcome p {
-    color: var(--muted);
+    color: #8291A5;
     font-size: 14px;
-    line-height: 1.7;
-    margin-bottom: 25px;
+    line-height: 1.8;
+    margin-bottom: 28px;
 }
+
+/* SUGGESTED QUESTIONS */
 
 .suggestion-list {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 10px;
+    gap: 12px;
 }
 
 .suggestion-btn {
-    background: var(--surface-light);
-    border: 1px solid var(--border);
-    color: #d5dbea;
-    padding: 11px 14px;
-    border-radius: 10px;
+    background: #EDF2F8;
+    border: 1px solid #D8E3EF;
+    color: #405A76;
+    padding: 12px 16px;
+    border-radius: 13px;
     font-size: 12px;
+    font-weight: 500;
     cursor: pointer;
-    transition: 0.2s;
+    transition: all 0.25s ease;
 }
 
 .suggestion-btn:hover {
-    border-color: var(--purple);
-    color: white;
+    background: #DCE7F2;
+    border-color: #91ADC9;
+    color: #263B57;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 14px rgba(38, 59, 87, 0.08);
 }
+
+.suggestion-btn:active {
+    transform: scale(0.97);
+}
+
 
 .chat-input-area {
     padding: 18px 22px;
     border-top: 1px solid var(--border);
 }
 
+
+
+
+/* CHAT INPUT AREA */
+
+.chat-input-area {
+    padding: 20px 24px;
+    border-top: 1px solid #E8EDF3;
+    background: #FFFFFF;
+}
+
 .chat-input-wrapper {
     display: flex;
-    gap: 12px;
+    gap: 10px;
     align-items: flex-end;
-    background: #0e1729;
-    border: 1px solid var(--border);
-    border-radius: 12px;
+    background: #F5F8FC;
+    border: 1px solid #DCE5EF;
+    border-radius: 17px;
     padding: 10px;
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 16px rgba(38, 59, 87, 0.04);
 }
 
 .chat-input-wrapper:focus-within {
-    border-color: var(--purple);
+    border-color: #7897B8;
+    box-shadow: 0 0 0 3px rgba(120, 151, 184, 0.14);
 }
 
 .chat-input {
@@ -681,48 +808,93 @@ tbody tr:last-child td {
     background: transparent;
     border: none;
     outline: none;
-    color: var(--text);
-    padding: 9px;
+    color: #344B64;
+    padding: 10px;
     font-family: inherit;
     font-size: 13px;
+    line-height: 1.6;
     max-height: 120px;
 }
 
 .chat-input::placeholder {
-    color: var(--muted);
+    color: #98A7B8;
 }
 
-.send-btn {
-    background: var(--purple);
-    color: white;
-    border: none;
-    border-radius: 9px;
-    padding: 11px 17px;
+/* MICROPHONE BUTTON */
+
+.mic-btn {
+    width: 42px;
+    height: 42px;
+    min-width: 42px;
+    border: 1px solid #D8E3EF;
+    border-radius: 12px;
+    background: #EAF0F7;
+    color: #42678F;
     cursor: pointer;
-    font-weight: 600;
+    font-size: 17px;
+    transition: all 0.25s ease;
+}
+
+.mic-btn:hover {
+    background: #DCE7F2;
+    border-color: #91ADC9;
+    transform: translateY(-2px);
+}
+
+.mic-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* SEND BUTTON */
+
+.send-btn {
+    background: linear-gradient(135deg, #7897B8, #42678F);
+    color: #FFFFFF;
+    border: none;
+    border-radius: 12px;
+    padding: 12px 20px;
+    min-height: 42px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    transition: all 0.25s ease;
 }
 
 .send-btn:hover {
-    background: var(--purple-hover);
+    background: linear-gradient(135deg, #6689AE, #345A82);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 14px rgba(66, 103, 143, 0.18);
+}
+
+.send-btn:active {
+    transform: scale(0.97);
 }
 
 .send-btn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
 }
+
+/* VOICE AND CHAT NOTES */
 
 .chat-note {
     text-align: center;
-    color: var(--muted);
+    color: #8291A5;
     font-size: 11px;
-    margin-top: 12px;
+    line-height: 1.6;
+    margin-top: 11px;
 }
 
 .typing-indicator {
-    color: var(--muted);
+    color: #8291A5;
     font-size: 12px;
     padding: 5px 0;
 }
+
 
 @media (max-width: 650px) {
     .chat-container {
@@ -802,5 +974,894 @@ tbody tr:last-child td {
 
     .summary-grid {
         grid-template-columns: 1fr;
+    }
+}
+
+/* =====================================
+   FINWISE AI - AUTHENTICATION PAGES
+===================================== */
+
+.auth-page {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 25px;
+    background:
+        radial-gradient(circle at top left, rgba(139, 92, 246, 0.15), transparent 40%),
+        var(--background);
+}
+
+.auth-card {
+    width: 100%;
+    max-width: 440px;
+    padding: 38px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+}
+
+.auth-brand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 35px;
+}
+
+.auth-brand h1 {
+    font-size: 23px;
+}
+
+.auth-subtitle {
+    color: #b49aff;
+    font-size: 12px;
+    margin-bottom: 9px;
+}
+
+.auth-card h2 {
+    font-size: 22px;
+    margin-bottom: 10px;
+}
+
+.auth-description {
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.6;
+    margin-bottom: 27px;
+}
+
+.auth-card .form-group {
+    margin-bottom: 20px;
+}
+
+.auth-submit {
+    width: 100%;
+    margin-top: 8px;
+}
+
+.auth-footer {
+    color: var(--muted);
+    font-size: 11px;
+    text-align: center;
+    margin-top: 25px;
+    line-height: 1.6;
+}
+
+@media (max-width: 480px) {
+    .auth-card {
+        padding: 27px 22px;
+    }
+}
+
+/* =====================================
+   FINWISE AI - BLUE THEME REFINEMENTS
+===================================== */
+
+/* Sidebar brand */
+.brand {
+    color: #F5F8FC;
+    letter-spacing: -0.5px;
+}
+
+.brand-icon {
+    background: linear-gradient(135deg, #91B3D3, #587DA5);
+    box-shadow: 0 5px 14px rgba(0, 0, 0, 0.15);
+}
+
+/* Sidebar navigation */
+.sidebar nav a {
+    color: #C3D1E1;
+    border: 1px solid transparent;
+    transition: all 0.25s ease;
+}
+
+.sidebar nav a:hover {
+    color: #FFFFFF;
+    background: rgba(220, 231, 242, 0.13);
+    border-color: rgba(220, 231, 242, 0.12);
+    transform: translateX(4px);
+}
+
+/* Sidebar footer */
+.sidebar-footer {
+    color: #B8C8D9;
+}
+
+.sidebar-footer a {
+    color: #DCE7F2;
+    text-decoration: none;
+}
+
+.sidebar-footer a:hover {
+    color: #FFFFFF;
+}
+
+/* Chat suggestion buttons */
+.suggestion-btn {
+    background: #EDF2F8;
+    border: 1px solid #D8E3EF;
+    color: #405A76;
+    padding: 12px 16px;
+    border-radius: 13px;
+    transition: all 0.25s ease;
+}
+
+.suggestion-btn:hover {
+    background: #DCE7F2;
+    border-color: #91ADC9;
+    color: #263B57;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 14px rgba(38, 59, 87, 0.08);
+}
+
+/* Chat scrollbar */
+.chat-messages {
+    scrollbar-width: thin;
+    scrollbar-color: #B9C9D9 transparent;
+}
+
+.chat-messages::-webkit-scrollbar {
+    width: 7px;
+}
+
+.chat-messages::-webkit-scrollbar-thumb {
+    background: #B9C9D9;
+    border-radius: 10px;
+}
+
+
+/* Refine sidebar typography */
+
+.brand {
+    font-weight: 600;
+    letter-spacing: -0.7px;
+}
+
+.sidebar nav a {
+    font-weight: 400;
+    letter-spacing: 0.2px;
+}
+
+.sidebar-footer {
+    font-weight: 400;
+}
+
+.sidebar-footer a {
+    font-weight: 400;
+}
+
+/* =====================================
+   FINWISE AI - SOFT INTERACTIONS
+===================================== */
+
+/* Smooth page appearance */
+.main-content {
+    animation: pageFadeIn 0.55s ease both;
+}
+
+@keyframes pageFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Dashboard and content cards */
+.summary-card,
+.content-card,
+.chart-card {
+    transition:
+        transform 0.3s ease,
+        box-shadow 0.3s ease,
+        border-color 0.3s ease;
+}
+
+.summary-card:hover,
+.content-card:hover,
+.chart-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-hover);
+    border-color: #C7D6E5;
+}
+
+/* Primary buttons */
+.primary-btn,
+.send-btn,
+.suggestion-btn {
+    transition: all 0.25s ease;
+}
+
+.primary-btn:hover,
+.send-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 7px 16px rgba(66, 103, 143, 0.18);
+}
+
+.primary-btn:active,
+.send-btn:active,
+.suggestion-btn:active {
+    transform: scale(0.97);
+}
+
+/* Respect reduced-motion preferences */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+
+/* =====================================
+   FINWISE AI - LIGHT FORM DESIGN
+===================================== */
+
+.form-group label {
+    color: #50647C;
+    font-weight: 500;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    background: #F7F9FC;
+    color: #344B64;
+    border: 1px solid #D9E3EE;
+    border-radius: 12px;
+    transition: all 0.25s ease;
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+    color: #98A7B8;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    background: #FFFFFF;
+    border-color: #7897B8;
+    box-shadow: 0 0 0 3px rgba(120, 151, 184, 0.13);
+}
+
+.form-group select option {
+    background: #FFFFFF;
+    color: #344B64;
+}
+
+.form-group input,
+.form-group select {
+    min-height: 46px;
+}
+
+.form-group input[type="date"],
+.form-group input[type="month"] {
+    color-scheme: light;
+}
+/* Keep chat bubbles stable on mouse hover */
+
+.chat-message:hover .message-content {
+    transform: none;
+    box-shadow: none;
+    filter: none;
+}
+
+.chat-message .message-content {
+    transition: none;
+}
+
+/* Premium transaction action buttons */
+
+.transaction-actions {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-top: 22px;
+    padding: 14px;
+    background: linear-gradient(135deg, #F4F7FB, #EAF0F7);
+    border: 1px solid #DCE6F0;
+    border-radius: 16px;
+    flex-wrap: wrap;
+}
+
+.confirm-transaction-btn,
+.cancel-transaction-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    min-height: 44px;
+    padding: 12px 22px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 650;
+    letter-spacing: 0.2px;
+    cursor: pointer;
+    transition: transform 0.25s ease,
+                box-shadow 0.25s ease,
+                background 0.25s ease;
+}
+
+/* Confirm button */
+
+.confirm-transaction-btn {
+    color: #FFFFFF;
+    background: linear-gradient(135deg, #587DA5, #304F73);
+    border: 1px solid #587DA5;
+    box-shadow: 0 5px 12px rgba(48, 79, 115, 0.2);
+}
+
+.confirm-transaction-btn::before {
+    content: "✓";
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.confirm-transaction-btn:hover {
+    background: linear-gradient(135deg, #42678F, #263B57);
+    box-shadow: 0 8px 18px rgba(38, 59, 87, 0.25);
+    transform: translateY(-3px);
+}
+
+/* Cancel button */
+
+.cancel-transaction-btn {
+    color: #52677F;
+    background: #FFFFFF;
+    border: 1px solid #C9D7E6;
+    box-shadow: 0 3px 8px rgba(38, 59, 87, 0.05);
+}
+
+.cancel-transaction-btn::before {
+    content: "×";
+    font-size: 19px;
+    font-weight: 500;
+}
+
+.cancel-transaction-btn:hover {
+    color: #A64F5B;
+    background: #FFF5F5;
+    border-color: #E7BFC3;
+    box-shadow: 0 6px 14px rgba(166, 79, 91, 0.1);
+    transform: translateY(-3px);
+}
+
+/* Keyboard and disabled states */
+
+.confirm-transaction-btn:focus-visible,
+.cancel-transaction-btn:focus-visible {
+    outline: 3px solid #9BB6D2;
+    outline-offset: 3px;
+}
+
+.confirm-transaction-btn:disabled,
+.cancel-transaction-btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+@media (max-width: 480px) {
+    .transaction-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .confirm-transaction-btn,
+    .cancel-transaction-btn {
+        width: 100%;
+    }
+}
+
+/* FinWise AI - Transaction Entry Form */
+
+.transaction-entry-card {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(145deg, #FFFFFF, #F7F9FC);
+    border: 1px solid #DCE6F0;
+    border-radius: 20px;
+    box-shadow: 0 8px 24px rgba(38, 59, 87, 0.07);
+}
+
+.transaction-entry-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 5px;
+    background: linear-gradient(90deg, #263B57, #7897B8, #C4D5E7);
+}
+
+.transaction-entry-card .section-heading {
+    margin-bottom: 26px;
+}
+
+.transaction-entry-card .section-heading h2 {
+    color: #263B57;
+    font-size: 21px;
+    font-weight: 700;
+    margin-bottom: 7px;
+}
+
+.transaction-entry-card .section-heading p {
+    color: #8291A5;
+    font-size: 14px;
+}
+
+.transaction-entry-form .form-grid {
+    gap: 22px;
+}
+
+.transaction-entry-form .form-group label {
+    display: block;
+    color: #40536B;
+    font-size: 13px;
+    font-weight: 650;
+    margin-bottom: 9px;
+}
+
+.transaction-entry-form .form-group input,
+.transaction-entry-form .form-group select {
+    width: 100%;
+    min-height: 46px;
+    padding: 11px 14px;
+    color: #26364A;
+    background: #F8FAFD;
+    border: 1px solid #DCE4EE;
+    border-radius: 11px;
+    font-size: 14px;
+    transition: border-color 0.2s ease,
+                box-shadow 0.2s ease,
+                background 0.2s ease;
+}
+
+.transaction-entry-form .form-group input:focus,
+.transaction-entry-form .form-group select:focus {
+    outline: none;
+    background: #FFFFFF;
+    border-color: #7897B8;
+    box-shadow: 0 0 0 4px rgba(120, 151, 184, 0.13);
+}
+
+.transaction-entry-form .form-group input::placeholder {
+    color: #A3AFBD;
+}
+
+.transaction-entry-form .form-actions {
+    display: flex;
+    gap: 13px;
+    margin-top: 28px;
+    padding-top: 20px;
+    border-top: 1px solid #E8EDF3;
+    flex-wrap: wrap;
+}
+
+.transaction-entry-form .form-actions .primary-btn {
+    min-height: 45px;
+    padding: 11px 22px;
+    border-radius: 11px;
+    font-weight: 650;
+    transition: transform 0.2s ease,
+                box-shadow 0.2s ease;
+}
+
+.transaction-entry-form .form-actions .primary-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 7px 16px rgba(38, 59, 87, 0.15);
+}
+
+@media (max-width: 600px) {
+    .transaction-entry-form .form-actions {
+        flex-direction: column;
+    }
+
+    .transaction-entry-form .form-actions .primary-btn {
+        width: 100%;
+    }
+}
+
+/* CSV Import - Compact Upload Bar */
+
+.csv-import-card {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 22px;
+    padding: 20px 24px;
+    margin-bottom: 24px;
+    background: linear-gradient(120deg, #FFFFFF, #F1F5FA);
+    border: 1px solid #DCE6F0;
+    border-radius: 16px;
+    box-shadow: 0 5px 18px rgba(38, 59, 87, 0.05);
+}
+
+.csv-import-card h2 {
+    margin: 0 0 5px;
+    color: #263B57;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.csv-import-card p {
+    margin: 0;
+    color: #8291A5;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.csv-import-card form {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+}
+
+.csv-import-card input[type="file"] {
+    width: 250px;
+    max-width: 100%;
+    padding: 7px;
+    color: #52677F;
+    background: #FFFFFF;
+    border: 1px dashed #B8C9DB;
+    border-radius: 9px;
+    font-size: 12px;
+}
+
+.csv-import-card .primary-btn {
+    min-height: 40px;
+    padding: 9px 17px;
+    white-space: nowrap;
+    border-radius: 9px;
+    font-size: 13px;
+}
+
+@media (max-width: 760px) {
+    .csv-import-card {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .csv-import-card form {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .csv-import-card input[type="file"],
+    .csv-import-card .primary-btn {
+        width: 100%;
+    }
+}
+
+/* Transaction Filters */
+
+.transaction-filter-card {
+    background: linear-gradient(135deg, #FFFFFF, #F8FAFD);
+    border: 1px solid #DCE6F0;
+    border-radius: 16px;
+    box-shadow: 0 5px 18px rgba(38, 59, 87, 0.05);
+}
+
+.transaction-filter-card .section-heading {
+    margin-bottom: 20px;
+}
+
+.transaction-filter-card .section-heading h2 {
+    color: #263B57;
+    font-size: 17px;
+}
+
+.transaction-filter-card .section-heading p {
+    color: #8291A5;
+    font-size: 13px;
+}
+
+.transaction-filter-card .form-grid {
+    gap: 18px;
+}
+
+.transaction-filter-card .form-group label {
+    color: #52677F;
+    font-size: 12px;
+    font-weight: 650;
+    margin-bottom: 8px;
+}
+
+.transaction-filter-card .form-group input,
+.transaction-filter-card .form-group select {
+    min-height: 42px;
+    background: #F8FAFD;
+    border: 1px solid #DCE4EE;
+    border-radius: 9px;
+    color: #26364A;
+    font-size: 13px;
+}
+
+.transaction-filter-card .form-group input:focus,
+.transaction-filter-card .form-group select:focus {
+    outline: none;
+    border-color: #7897B8;
+    box-shadow: 0 0 0 3px rgba(120, 151, 184, 0.13);
+}
+
+.transaction-filter-card .form-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+}
+
+.transaction-filter-card .text-link {
+    color: #587DA5;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.transaction-filter-card .text-link:hover {
+    color: #263B57;
+    text-decoration: underline;
+}
+
+@media (max-width: 600px) {
+    .transaction-filter-card .form-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .transaction-filter-card .form-actions .primary-btn {
+        width: 100%;
+    }
+}
+
+
+/* Transaction History */
+
+.transaction-history-card {
+    background: #FFFFFF;
+    border: 1px solid #DCE6F0;
+    border-radius: 16px;
+    box-shadow: 0 5px 18px rgba(38, 59, 87, 0.05);
+}
+
+.transaction-history-card .section-heading h2 {
+    color: #263B57;
+    font-size: 18px;
+}
+
+.transaction-history-card .section-heading p {
+    color: #8291A5;
+    font-size: 13px;
+}
+
+.transaction-history-card .record-count {
+    padding: 7px 12px;
+    color: #526F91;
+    background: #EAF0F7;
+    border: 1px solid #DCE6F0;
+    border-radius: 20px;
+    font-weight: 600;
+}
+
+.transaction-history-card .table-wrapper {
+    overflow-x: auto;
+    border: 1px solid #E5EBF2;
+    border-radius: 12px;
+}
+
+.transaction-history-card table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.transaction-history-card th {
+    padding: 14px 15px;
+    color: #52677F;
+    background: #F1F5FA;
+    font-size: 12px;
+    font-weight: 700;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.transaction-history-card td {
+    padding: 14px 15px;
+    color: #40536B;
+    font-size: 13px;
+    border-bottom: 1px solid #EDF1F5;
+    white-space: nowrap;
+}
+
+.transaction-history-card tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.transaction-history-card tbody tr:hover {
+    background: #F7F9FC;
+}
+
+.transaction-history-card .delete-btn {
+    padding: 7px 12px;
+    color: #B45D68;
+    background: #FFF3F3;
+    border: 1px solid #F0D8DA;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.transaction-history-card .delete-btn:hover {
+    color: #FFFFFF;
+    background: #C66F79;
+    border-color: #C66F79;
+}
+
+/* ========================================
+   BUDGET PAGE DESIGN
+======================================== */
+
+/* Month selection */
+.budget-month-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 24px;
+    box-shadow: var(--shadow-soft);
+}
+
+.budget-month-card form {
+    display: flex;
+    align-items: flex-end;
+    gap: 18px;
+    flex-wrap: wrap;
+}
+
+.budget-month-card .form-group {
+    flex: 1;
+    min-width: 200px;
+    margin-bottom: 0;
+}
+
+/* Budget summary cards */
+.budget-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
+    margin: 24px 0;
+}
+
+.budget-summary-grid .summary-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 24px;
+    box-shadow: var(--shadow-soft);
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.budget-summary-grid .summary-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-hover);
+}
+
+/* Set category budget */
+.budget-form-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 26px;
+    margin-bottom: 24px;
+    box-shadow: var(--shadow-soft);
+}
+
+.budget-form-card .form-group {
+    margin-bottom: 18px;
+}
+
+.budget-form-card input,
+.budget-form-card select,
+.budget-month-card input {
+    background: var(--pearl);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    padding: 12px 14px;
+}
+
+.budget-form-card input:focus,
+.budget-form-card select:focus,
+.budget-month-card input:focus {
+    border-color: var(--dusty-blue);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(120, 151, 184, 0.15);
+}
+
+/* Budget tracking */
+.budget-tracking-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 26px;
+    box-shadow: var(--shadow-soft);
+    overflow-x: auto;
+}
+
+.budget-tracking-card table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.budget-tracking-card th {
+    background: var(--surface-light);
+    color: var(--deep-blue);
+    font-weight: 600;
+    padding: 15px;
+    text-align: left;
+}
+
+.budget-tracking-card td {
+    padding: 15px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+}
+
+.budget-tracking-card tbody tr:hover {
+    background: var(--pearl);
+}
+
+/* Responsive layout */
+@media (max-width: 768px) {
+    .budget-summary-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .budget-month-card form {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .budget-month-card .form-group {
+        width: 100%;
+    }
+
+    .budget-form-card,
+    .budget-tracking-card,
+    .budget-month-card {
+        padding: 18px;
     }
 }
